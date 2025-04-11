@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raga Detection System</title>
+    <style>
+        /* General Reset */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background-color: #f0f4f8;
+        }
+
+        header {
+            background: url('https://www.ramana-maharshi.org/wp-content/uploads/2024/06/Traditional_Sounds_The_Role_of_Hindu_Musical_Instruments_0001.jpg') no-repeat center center;
+            background-size: cover;
+            color: #fafafa;
+            text-align: center;
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 5rem;
+            font-family: 'Patrick Hand', cursive;
+            margin-bottom: 1rem;
+        }
+        
+
+        header p {
+            font-size: 1.5rem;
+            background-color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        /* Navbar */
+        nav {
+            background: #000000;
+            color: #f7fafc;
+            padding: 1rem 2rem;
+            height: 8%;
+            display: flex;
+            justify-content:left;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+        }
+
+        nav a {
+            color: #f7fafc;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 0.5rem 1rem;
+            margin: 0 1rem;
+            transition: all 0.3s;
+            border-radius: 5px;
+        }
+
+        nav a:hover {
+            background: #3182ce;
+            color: #fff;
+        }
+
+        /* Create space for the fixed navbar */
+        .container {
+            padding: 2rem;
+            max-width: 1100px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 80px;
+        }
+
+        h2 {
+            color: #333;
+        }
+        p {
+            margin: 5px 0;
+        }
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .section p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: #4a5568;
+            line-height: 1.8;
+        }
+
+        /* Predict Raga Section */
+        .upload-form {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .upload-form input[type="file"] {
+            display: block;
+            margin: 1rem auto;
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            background: #edf2f7;
+            color: #2d3748;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-form input[type="file"]:hover {
+            background-color: #d1d9e6;
+            transform: scale(1.05);
+        }
+
+        .upload-form button {
+            background: linear-gradient(45deg, #3182ce, #63b3ed);
+            color: #f7fafc;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-form button:hover {
+            background: linear-gradient(45deg, #2b6cb0, #4c8fb6);
+            box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        /* Result Box */
+        #result {
+            margin-top: 2rem;
+            font-size: 1.5rem;
+            padding: 2rem;
+            background: linear-gradient(45deg, #e2e8f0, #edf2f7);
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        #audioPlayer {
+            margin-top: 1rem;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            background: #000;
+            color: #f7fafc;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background-color: #f0f4f8;
+        }
+
+        header {
+            background: url('https://www.ramana-maharshi.org/wp-content/uploads/2024/06/Traditional_Sounds_The_Role_of_Hindu_Musical_Instruments_0001.jpg') no-repeat center center;
+            background-size: cover;
+            color: #fafafa;
+            text-align: center;
+            padding: 6rem 0;
+            position: relative;
+        }
+        
+
+        header h1 {
+            font-size: 5rem;
+            font-family: 'Patrick Hand', cursive;
+            margin-bottom: 1rem;
+        }
+
+        header p {
+            font-size: 1.5rem;
+            background-color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+
+        h2 {
+            color: #333;
+        }
+        p {
+            margin: 5px 0;
+        }
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .section h2 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .section p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: #4a5568;
+            line-height: 1.8;
+        }
+
+        /* Predict Raga Section */
+        .upload-form {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .upload-form input[type="file"] {
+            display: block;
+            margin: 1rem auto;
+            padding: 0.8rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            background: #edf2f7;
+            color: #2d3748;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-form input[type="file"]:hover {
+            background-color: #d1d9e6;
+            transform: scale(1.05);
+        }
+
+        .upload-form button {
+            background: linear-gradient(45deg, #3182ce, #63b3ed);
+            color: #f7fafc;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-form button:hover {
+            background: linear-gradient(45deg, #2b6cb0, #4c8fb6);
+            box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        /* Result Box */
+        #result {
+            margin-top: 2rem;
+            font-size: 1.5rem;
+            padding: 2rem;
+            background: linear-gradient(45deg, #e2e8f0, #edf2f7);
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        #audioPlayer {
+            margin-top: 1rem;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            background: #000;
+            color: #f7fafc;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .raga-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .raga {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Raga Detection System</h1>
+        <p>Explore the soulful world of Indian classical music through cutting-edge AI technology.</p>
+    </header>
+
+    <div class="container">
+        <h1>Raga Information</h1>
+        <br>
+        <br>
+        <div class="raga-container">
+            <div class="raga">
+                <h2>Asavari</h2>
+                <p><strong>Thaat:</strong> Asavari</p>
+                <p><strong>Jati:</strong> Audav-Sampurna</p>
+                <p><strong>Vadi:</strong> Dha</p>
+                <p><strong>Samvadi:</strong> Ga</p>
+                <p><strong>Time:</strong> Morning (9 AM - 12 PM)</p>
+                <p><strong>Mood:</strong> Serious, meditative</p>
+                <p><strong>Usage:</strong> Used in devotional and serious classical music.</p>
+                <p><strong>Notes:</strong> Aaroh: Sa Re Ga Ma Pa Dha Sa, Avaroh: Sa Ni Dha Pa Ma Ga Re Sa</p>
+                <p><strong>Important Notes:</strong> Komal Ga, Dha, Ni</p>
+                <p><strong>Sample Tune:</strong> Sa Re Ga Ma Pa Dha Sa - Sa Ni Dha Pa Ma Ga Re Sa</p>
+                <audio controls>
+                    <source src="C:\\Users\\shrey\\OneDrive\\Desktop\\raga_detection\\new_raga\\ragas\\asavari02.wav" type="audio/mpeg">
+                </audio>
+            </div>
+            <div class="raga">
+                <h2>Bhoop</h2>
+                <p><strong>Thaat:</strong> Kalyan</p>
+                <p><strong>Jati:</strong> Audav-Audav</p>
+                <p><strong>Vadi:</strong> Ga</p>
+                <p><strong>Samvadi:</strong> Dha</p>
+                <p><strong>Time:</strong> Evening (6 PM - 9 PM)</p>
+                <p><strong>Mood:</strong> Peaceful, devotional</p>
+                <p><strong>Usage:</strong> Common in bhajans and light classical music.</p>
+                <p><strong>Notes:</strong> Aaroh: Sa Re Ga Pa Dha Sa, Avaroh: Sa Dha Pa Ga Re Sa</p>
+                <p><strong>Important Notes:</strong> No Ma, No Ni</p>
+                <p><strong>Sample Tune:</strong> Sa Re Ga Pa Dha Sa - Sa Dha Pa Ga Re Sa</p>
+                <audio controls>
+                    <source src="C:\\Users\\shrey\\OneDrive\\Desktop\\raga_detection\\new_raga\\ragas\\bhoop02.wav" type="audio/mpeg">
+                </audio>
+            </div>
+            <div class="raga">
+                <h2>Bhageshree</h2>
+                <p><strong>Thaat:</strong> Kafi</p>
+                <p><strong>Jati:</strong> Audav-Sampurna</p>
+                <p><strong>Vadi:</strong> Ma</p>
+                <p><strong>Samvadi:</strong> Sa</p>
+                <p><strong>Time:</strong> Night (9 PM - 12 AM)</p>
+                <p><strong>Mood:</strong> Romantic, melancholic</p>
+                <p><strong>Usage:</strong> Often used in semi-classical and film music.</p>
+                <p><strong>Notes:</strong> Aaroh: Sa Ga Ma Dha Ni Sa, Avaroh: Sa Ni Dha Pa Ma Ga Re Sa</p>
+                <p><strong>Important Notes:</strong> Komal Ga, Ni</p>
+                <p><strong>Sample Tune:</strong> Sa Ga Ma Dha Ni Sa - Sa Ni Dha Pa Ma Ga Re Sa</p>
+                <audio controls>
+                    <source src="C:\\Users\\shrey\\OneDrive\\Desktop\\raga_detection\\new_raga\\ragas\\bageshree30.wav" type="audio/mpeg">
+                </audio>
+            </div>
+            <div class="raga">
+                <h2>Yaman</h2>
+                <p><strong>Thaat:</strong> Kalyan</p>
+                <p><strong>Jati:</strong> Sampurna-Sampurna</p>
+                <p><strong>Vadi:</strong> Ga</p>
+                <p><strong>Samvadi:</strong> Ni</p>
+                <p><strong>Time:</strong> Evening (6 PM - 9 PM)</p>
+                <p><strong>Mood:</strong> Devotional, calm, peaceful, full of love</p>
+                <p><strong>Usage:</strong> Commonly used in light music, bhajans, film songs.</p>
+                <p><strong>Notes:</strong> Aaroh: Sa Re Ga Ma Dha Ni Sa, Avaroh: Sa Ni Dha Pa Ma Ga Re Sa</p>
+                <p><strong>Important Notes:</strong> Teevra Ma is used</p>
+                <p><strong>Sample Tune:</strong> Sa Re Ga Ma Dha Ni Sa - Sa Ni Dha Pa Ma Ga Re Sa</p>
+                <audio controls>
+                    <source src="C:\\Users\\shrey\\OneDrive\\Desktop\\raga_detection\\new_raga\\ragas\\yaman04.wav" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <div class="raga">
+                <h2>Bhairavi</h2>
+                <p><strong>Thaat:</strong> Bhairavi</p>
+                <p><strong>Jati:</strong> Sampurna-Sampurna</p>
+                <p><strong>Vadi:</strong> Dha</p>
+                <p><strong>Samvadi:</strong> Ga</p>
+                <p><strong>Time:</strong> Morning (Any time, commonly last in concerts)</p>
+                <p><strong>Mood:</strong> Devotional, serious, melancholic</p>
+                <p><strong>Usage:</strong> Often played in classical concerts as the last raga.</p>
+                <p><strong>Notes:</strong> Aaroh: Sa Re Ga Ma Pa Dha Ni Sa, Avaroh: Sa Ni Dha Pa Ma Ga Re Sa</p>
+                <p><strong>Important Notes:</strong> All Komal Notes</p>
+                <p><strong>Sample Tune:</strong> Sa Re Ga Ma Pa Dha Ni Sa - Sa Ni Dha Pa Ma Ga Re Sa</p>
+                <audio controls>
+                    <source src="C:\\Users\\shrey\\OneDrive\\Desktop\\raga_detection\\new_raga\\ragas\\bhairavi28.wav" type="audio/mpeg">
+                </audio>
+            </div>
+            <div class="raga">
+                <h2>Sarang</h2>
+                <p><strong>Thaat:</strong> Kafi</p>
+                <p><strong>Jati:</strong> Audav-Audav</p>
+                <p><strong>Vadi:</strong> Re</p>
+                <p><strong>Samvadi:</strong> Pa</p>
+                <p><strong>Time:</strong> Afternoon (12 PM - 3 PM)</p>
+                <p><strong>Mood:</strong> Playful, light, refreshing</p>
+                <p><strong>Usage:</strong> Commonly sung during summer afternoons, evokes nature.</p>
+                <p><strong>Notes:</strong> Aaroh: Sa Re Ma Pa Ni Sa, Avaroh: Sa Ni Pa Ma Re Sa</p>
+                <p><strong>Important Notes:</strong> No Ga, No Dha</p>
+                <p><strong>Sample Tune:</strong> Sa Re Ma Pa Ni Sa - Sa Ni Pa Ma Re Sa</p>
+                <audio controls>
+                    <source src="C:\\Users\\shrey\\OneDrive\\Desktop\\raga_detection\\new_raga\\ragas\\sarang02.wav" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <div class="raga">
+                <h2>Darbari Kanada</h2>
+                <p><strong>Thaat:</strong> Asavari</p>
+                <p><strong>Jati:</strong> Vakra-Sampurna</p>
+                <p><strong>Vadi:</strong> Re</p>
+                <p><strong>Samvadi:</strong> Pa</p>
+                <p><strong>Time:</strong> Late Night (12 AM - 3 AM)</p>
+                <p><strong>Mood:</strong> Serious, deep, pathos-filled</p>
+                <p><strong>Usage:</strong> Often used in classical and semi-classical compositions, conveying deep emotions.</p>
+                <p><strong>Notes:</strong> Aaroh: Sa Re ga Ma Pa dha ni Sa, Avaroh: Sa ni dha Pa Ma ga Re Sa</p>
+                <p><strong>Important Notes:</strong> Use of Komal Ga, Komal Dha, and Komal Ni</p>
+                <p><strong>Sample Tune:</strong> Sa Re ga Ma Pa dha ni Sa - Sa ni dha Pa Ma ga Re Sa</p>
+                <audio controls>
+                    <source src="C:\\Users\\shrey\\OneDrive\\Desktop\\raga_detection\\new_raga\\ragas\\DKanada02.wav" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+            <div class="raga">
+                <h2>Malkauns</h2>
+                <p><strong>Thaat:</strong> Bhairav</p>
+                <p><strong>Jati:</strong> Audav-Audav</p>
+                <p><strong>Vadi:</strong> Ma</p>
+                <p><strong>Samvadi:</strong> Sa</p>
+                <p><strong>Time:</strong> Late Night (12 AM - 3 AM)</p>
+                <p><strong>Mood:</strong> Intense, meditative, mysterious</p>
+                <p><strong>Usage:</strong> Frequently used in Dhrupad and other slow-tempo classical forms.</p>
+                <p><strong>Notes:</strong> Aaroh: Sa ga Ma dha ni Sa, Avaroh: Sa ni dha Ma ga Sa</p>
+                <p><strong>Important Notes:</strong> Only five notes (Sa, Komal Ga, Ma, Komal Dha, Komal Ni)</p>
+                <p><strong>Sample Tune:</strong> Sa ga Ma dha ni Sa - Sa ni dha Ma ga Sa</p>
+                <audio controls>
+                    <source src="C:\\Users\\shrey\\OneDrive\\Desktop\\raga_detection\\new_raga\\ragas\\malkauns04.wav" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
